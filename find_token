@@ -1,0 +1,73 @@
+#!/usr/bin/python3
+
+import re
+import requests
+import click
+from rich import print as dprint
+from rich.panel import Panel 
+
+colors = {
+        "gray"    : "\033[90;1m",
+        "red "    : "\033[91;1m",
+        "green"   : "\033[92;1m",
+        "white_u" : "\033[97;1;4m",
+        "yellow"  : "\033[93;1m",
+        "reset"   : "\033[0m",
+    }
+
+headers = {
+        "user-agent" : "Mozilla/5.0 (Linux; Android 6.0.1; Redmi 4A Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/60.0.3112.116 Mobile Safari/537.36",                                                  "referer": "https://www.facebook.com/",
+        "host": "business.facebook.com",
+        "origin": "https://business.facebook.com",
+        "upgrade-insecure-requests" : "1",
+        "accept-language" : "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+        "cache-control" : "max-age=0",
+        "accept" : "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        "content-type":"text/html; charset=utf-8",
+    }
+
+@click.command()
+@click.option("--get",
+              help="%s./find_token%s --get%s <%syour_cookies%s>"%(
+                  colors['white_u'],
+                  colors['yellow'],
+                  colors['reset'],
+                  colors['green'],
+                  colors['reset'],
+                ),
+            )
+def cookies(get):
+    try:
+        req = requests.get(
+                "https://business.facebook.com/business_locations",
+                headers=headers,
+                cookies={
+                    "cookie" : get
+                    },
+                )
+        _get = (re.search('(\["EAAG\w+)', req.text).group(1).replace('["',''))
+        dprint(
+                "[blue bold]Token :[green bold] %s"%(
+                    _get
+                )
+            )
+    except requests.ConnectionError:
+        print(
+                'koneksi error ...'
+                )
+    except AttributeError:
+        dprint(
+                Panel(
+                    "[red bold] cookies salah ... "
+                )
+            )
+#    except Exception as exp:
+#        dprint(
+#                Panel(
+#                    '[red bold] Gunakan : [white]./find_token [yellow bold]--get [reset]"[green bold]your_cookies[reset]"'
+#                )
+#            )
+
+if __name__ == "__main__":
+    cookies()
+
